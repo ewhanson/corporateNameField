@@ -1,29 +1,19 @@
 <?php
+
+/**
+ * @file plugins/generic/corporateNameField/CorporateNameFieldPlugin.inc.php
+ *
+ * Copyright (c) 2014-2020 Simon Fraser University
+ * Copyright (c) 2003-2020 John Willinsky
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+ *
+ * @class CorporateNameFieldPlugin
+ *
+ * @brief Plugin that adds a corporate name field for contributors.
+ */
 import('lib.pkp.classes.plugins.GenericPlugin');
+
 class CorporateNameFieldPlugin extends GenericPlugin {
-    /**
-     * Get the display name of this plugin
-     * 
-     * The name will appear in the plugins list where editors can
-     * enable and disable plugins.
-     * 
-     * @return string
-     */
-    public function getDisplayName() {
-        return __('plugins.generic.corporateNameField.displayName');
-    }
-
-    /**
-     * Get the description of this plugin
-     * 
-     * The description will appear in the plugins list where editors can
-     * enable and disable plugins.
-     * @return string
-     */
-    public function getDescription() {
-        return __('plugins.generic.corporateNameField.description');
-    }
-
     /**
      * @copydoc Plugin::register()
      */
@@ -33,9 +23,88 @@ class CorporateNameFieldPlugin extends GenericPlugin {
         $success = parent::register($category, $path);
 
 		if ($success && $this->getEnabled()) {
-            // Do something when the plugin is enabled
+            HookRegistry::register('Schema::get::author', array($this, 'addToSchema'));
+            HookRegistry::register('authorform::initdata', array($this, 'initFormData'));
+            HookRegistry::register('authorform::readuservars', array($this, 'addUserVars'));
+            HookRegistry::register('authorform::execute', array($this, 'executeForm'));
         }
 
 		return $success;
-	}
+    }
+
+    /**
+	 * Add a property to the author schema
+	 *
+	 * @param $hookName string `Schema::get::author`
+	 * @param $schema object Author schema
+	 */
+    public function addToSchema($hookName, $schema) {
+        $prop = '{
+            "type": "string",
+            "multilingual": "true",
+			"apiSummary": true,
+			"validation": [
+				"nullable"
+			]
+		}';
+        $schema->properties->corporateName = json_decode($prop);
+    }
+
+    /**
+     * Prepares initial input into the form.
+     * 
+     * @param $hookName string `authorform::initdata`
+     * @param $args array Arguments passed by hook
+     */
+    public function initFormData($hookName, $args) {
+        $form = $args[0];
+        $author = $form->getAuthor();
+
+        // If there is an author, get corporate name field from author
+        if ($author) { 
+            // Use format like: $form->_data['corporateName'] = NAME_FROM_AUTHOR;
+            $form->_data['corporateName'] = $author->getData('corporateName', null);
+        } else {
+            // Add blank or unnecessary?
+        }
+    }
+
+    /**
+     * Description.
+     * 
+     * @param $hookName string `authorform::readuservars`
+     * @param $args array Arguments passed by hook
+     */
+    public function addUserVars($hookname, $args) {
+        $vars = &$args[1];
+        array_push($vars,'corporateName');
+    }
+
+    /**
+     * Description.
+     * 
+     * @param $hookName string `authorform::execute`
+     * @param $args array Arguments passed by hook
+     */
+    public function executeForm($hookName, $args) {
+        $form = &$args[0];
+        $author = $form->getAuthor();
+        // Do this but wihtout setter
+        // $author->setPreferredPublicName($this->getData('preferredPublicName'), null);
+        $author->setData('corporateName',$form->getData('corporateName'), null);
+    }
+    
+    /**
+	 * @copydoc PKPPlugin::getDisplayName
+	 */
+    public function getDisplayName() {
+        return __('plugins.generic.corporateNameField.displayName');
+    }
+
+    /**
+	 * @copydoc PKPPlugin::getDescription
+	 */
+    public function getDescription() {
+        return __('plugins.generic.corporateNameField.description');
+    }
 }

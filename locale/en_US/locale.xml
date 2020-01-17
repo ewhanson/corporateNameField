@@ -3,4 +3,5 @@
 <locale name="en_US" full_name="U.S. English">
 	<message key="plugins.generic.corporateNameField.displayName">Corporate Name Field</message>
 	<message key="plugins.generic.corporateNameField.description">This plugin adds the option to list a coporate entity (single field) as an author/contributor.</message>
+	<message key="plugins.generic.corporateNameField.formDisplayName">Corporate Name</message>
 </locale>
