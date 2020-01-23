@@ -33,7 +33,7 @@ class CorporateNameFieldPlugin extends GenericPlugin {
     }
 
     /**
-	 * Add a property to the author schema
+	 * Add a property to the author schema.
 	 *
 	 * @param $hookName string `Schema::get::author`
 	 * @param $schema object Author schema
@@ -62,15 +62,12 @@ class CorporateNameFieldPlugin extends GenericPlugin {
 
         // If there is an author, get corporate name field from author
         if ($author) { 
-            // Use format like: $form->_data['corporateName'] = NAME_FROM_AUTHOR;
             $form->_data['corporateName'] = $author->getData('corporateName', null);
-        } else {
-            // Add blank or unnecessary?
         }
     }
 
     /**
-     * Description.
+     * Adds corporate name variable to input data.
      * 
      * @param $hookName string `authorform::readuservars`
      * @param $args array Arguments passed by hook
@@ -81,7 +78,7 @@ class CorporateNameFieldPlugin extends GenericPlugin {
     }
 
     /**
-     * Description.
+     * Executes form's action with corporate name data.
      * 
      * @param $hookName string `authorform::execute`
      * @param $args array Arguments passed by hook
