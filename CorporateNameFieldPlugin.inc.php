@@ -17,36 +17,36 @@ class CorporateNameFieldPlugin extends GenericPlugin {
     /**
      * @copydoc Plugin::register()
      */
-	public function register($category, $path, $mainContextId = NULL) {
+    public function register($category, $path, $mainContextId = NULL) {
 
         // Register the plugin even when it is not enabled
         $success = parent::register($category, $path);
 
-		if ($success && $this->getEnabled()) {
+        if ($success && $this->getEnabled()) {
             HookRegistry::register('Schema::get::author', array($this, 'addToSchema'));
             HookRegistry::register('authorform::initdata', array($this, 'initFormData'));
             HookRegistry::register('authorform::readuservars', array($this, 'addUserVars'));
             HookRegistry::register('authorform::execute', array($this, 'executeForm'));
         }
 
-		return $success;
+        return $success;
     }
 
     /**
-	 * Add a property to the author schema.
-	 *
-	 * @param $hookName string `Schema::get::author`
-	 * @param $schema object Author schema
-	 */
+     * Add a property to the author schema.
+     *
+     * @param $hookName string `Schema::get::author`
+     * @param $schema object Author schema
+     */
     public function addToSchema($hookName, $schema) {
         $prop = '{
             "type": "string",
             "multilingual": "true",
-			"apiSummary": true,
-			"validation": [
-				"nullable"
-			]
-		}';
+            "apiSummary": true,
+            "validation": [
+                "nullable"
+            ]
+        }';
         $schema->properties->corporateName = json_decode($prop);
     }
 
@@ -92,15 +92,15 @@ class CorporateNameFieldPlugin extends GenericPlugin {
     }
     
     /**
-	 * @copydoc PKPPlugin::getDisplayName
-	 */
+     * @copydoc PKPPlugin::getDisplayName
+     */
     public function getDisplayName() {
         return __('plugins.generic.corporateNameField.displayName');
     }
 
     /**
-	 * @copydoc PKPPlugin::getDescription
-	 */
+     * @copydoc PKPPlugin::getDescription
+     */
     public function getDescription() {
         return __('plugins.generic.corporateNameField.description');
     }
